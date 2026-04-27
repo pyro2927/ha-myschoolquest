@@ -16,7 +16,7 @@ A complete solution to bring your school's daily menu into Home Assistant. Perfe
 
 ```bash
 # Clone this repository
-git clone https://github.com/YOUR_GITHUB_USERNAME/ha-myschoolquest.git
+git clone https://github.com/pyro2927/ha-myschoolquest.git
 cd ha-myschoolquest
 
 # Create a config directory and start Home Assistant
@@ -40,7 +40,7 @@ myschoolquest:
 1. Open HACS in Home Assistant
 2. Go to **Integrations** → Click the three dots
 3. Select **Custom repositories**
-4. Add URL: `https://github.com/YOUR_GITHUB_USERNAME/ha-myschoolquest`
+4. Add URL: `https://github.com/pyro2927/ha-myschoolquest`
 5. Set Category to **Integration**, click **Add**
 6. Search for "MySchoolQuest Menu" and click **Download**
 7. Restart Home Assistant
@@ -180,7 +180,7 @@ If you encounter any issues:
 
 1. Check the Home Assistant logs: `docker-compose logs homeassistant`
 2. Verify your location_id is correct
-3. [Open an issue on GitHub](https://github.com/YOUR_GITHUB_USERNAME/ha-myschoolquest/issues)
+3. [Open an issue on GitHub](https://github.com/pyro2927/ha-myschoolquest/issues)
 
 ## License
 
