@@ -173,7 +173,91 @@ cards:
       {% else %}
       No lunch available today
       {% endfor %}
-```
+
+  ## 🎯 Main Course Selection (Individual Cards)
+  
+  Display each main entree as an individual Mushroom Card for easy selection:
+  
+  ```yaml
+  type: horizontal-stack
+  cards:
+    # Dynamic list of main course items using template cards
+    {% set lunch = state_attr('sensor.today_s_lunch_menu', 'categories') %}
+    {% if lunch['Main Course'] %}
+      {% for item in lunch['Main Course'] | map('lower') | list %}
+        - type: custom:mushroom-chips-card
+          chips:
+            - type: template
+              icon: mdi:silverware-fork-knife
+              content: "{{ '{{ states.sensor.today_s_lunch_menu.attributes.categories["Main Course"][loop.index0] }}' }}"
+              tap_action:
+                action: call-service
+                service: notify.mobile_app_your_phone
+                service_data:
+                  message: "{{ '{{ item.title }}' }} selected!"
+              card_mod:
+                style: |
+                  ha-card {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                  }
+          card_mod:
+            style: |
+              .chips { flex-wrap: wrap; gap: 8px; justify-content: center; }
+      {% endfor %}
+    {% endif %}
+  ```
+
+  ### Alternative: Simple Card Grid (No Templates)
+
+  For a simpler approach without Jinja2 templating, create static cards for popular main courses:
+  
+  ```yaml
+  type: vertical-stack
+  cards:
+    - type: custom:mushroom-title-card
+      title: "🍽️ Today's Main Course"
+    
+    # Add your son's favorite items as individual cards
+    - type: custom:mushroom-entity-card
+      entity: sensor.today_s_lunch_menu
+      name: "Teriyaki Chicken & Broccoli Rice Bowl"
+      icon: mdi:food-drumstick
+      chip_content:
+        - "High Protein"
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+          }
+    
+    - type: custom:mushroom-entity-card
+      entity: sensor.today_s_lunch_menu
+      name: "Breaded Chicken Breast Patty Sandwich"
+      icon: mdi:hamburger
+      chip_content:
+        - "Classic Favorite"
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+          }
+    
+    - type: custom:mushroom-entity-card
+      entity: sensor.today_s_lunch_menu
+      name: "Chicken Caesar Salad with Dinner Roll"
+      icon: mdi:salad
+      chip_content:
+        - "Healthy Option"
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+          }
+  ```
 
 ### Alternative: Bubble Chart Display (Advanced)
 
