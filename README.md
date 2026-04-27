@@ -78,38 +78,126 @@ myschoolquest:
 ## Sensors Created
 
 - `sensor.school_menu_week` - Main sensor with all menu data
-- `sensor.today_s_school_menu` - Today's parsed menu (template sensor)
-- `sensor.tomorrow_s_school_menu` - Tomorrow's parsed menu (template sensor)
+- `sensor.tomorrow_s_lunch_menu` - Tomorrow's lunch items as lists
+- **All sensors include:** `items`, `categories`, `category_names`, `item_count`, `available` attributes
 
 ### Example Sensor Attributes
 
 ```json
 {
-  "breakfast": {
-    "Hot Item": ["Pancakes", "Eggs"],
-    "Cold Item": ["Cereal", "Milk"]
+  "items": ["Peach Yogurt Parfait", "Cheerios", ...],
+  "categories": {
+    "Main Entree": ["item1", "item2"],
+    "Fruit": ["apples", "bananas"]
   },
-  "lunch": {
-    "Main Course": ["Chicken Nuggets", "Fries"],
-    "Side": ["Carrots", "Apple Slices"],
-    "Dessert": ["Cookie"]
-  }
+  "category_names": ["Main Entree", "Fruit"],
+  "item_count": 10,
+  "available": true,
+  "date": "2026-04-27"
 }
 ```
 
 ## Dashboard Card
 
-A beautiful dashboard card is included in `dashboard_card.yaml`. To use it:
+### Quick Start: Mushroom Cards (Recommended)
 
-1. Edit your Home Assistant dashboard
-2. Add a new card → Manual card type  
-3. Copy the YAML from `dashboard_card.yaml`
-4. Save and enjoy!
+For the best experience, use **Mushroom Cards** with a vertical stack layout:
 
-### Recommended HACS Integrations (Optional)
+```yaml
+type: vertical-stack
+cards:
+  - type: custom:mushroom-title-card
+    title: "🍽️ Today's School Menu"
+    subtitle: "{{ now().strftime('%B %d, %Y') }}"
+    
+  # Breakfast Section
+  - type: horizontal-stack
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: sensor.today_s_breakfast_menu
+        name: "🌅 Breakfast"
+        icon: mdi:silverware-fork-knife
+        layout: vertical
+        tap_action:
+          action: more-info
+        card_mod:
+          style: |
+            ha-card {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+            }
+      - type: custom:mushroom-entity-card
+        entity: sensor.today_s_lunch_menu
+        name: "🍽️ Lunch"
+        icon: mdi:silverware-fork-knife
+        layout: vertical
+        tap_action:
+          action: more-info
+        card_mod:
+          style: |
+            ha-card {
+              background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+              color: white;
+            }
 
-- **[Mushroom Cards](https://github.com/piitaya/ha-mushroom)** - Modern card styling
-- **[Card Mod](https://github.com/thomasloven/ha-card_mod)** - Custom CSS support
+  - type: markdown
+    content: |
+      ## 🥣 Breakfast Options
+      {% set breakfast = state_attr('sensor.today_s_breakfast_menu', 'categories') %}
+      {% for category, items in breakfast.items() if items %}
+      <details>
+        <summary><strong>{{ category }}</strong></summary>
+        <ul style="margin-top: 0;">
+          {% for item in items %}
+          <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </details>
+      {% else %}
+      No breakfast available today
+      {% endfor %}
+
+  - type: markdown
+    content: |
+      ## 🥘 Lunch Options
+      {% set lunch = state_attr('sensor.today_s_lunch_menu', 'categories') %}
+      {% for category, items in lunch.items() if items %}
+      <details>
+        <summary><strong>{{ category }}</strong></summary>
+        <ul style="margin-top: 0;">
+          {% for item in items %}
+          <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </details>
+      {% else %}
+      No lunch available today
+      {% endfor %}
+```
+
+### Alternative: Bubble Chart Display (Advanced)
+
+Create a custom bubble chart showing category sizes using **Card Mod** or **Pie Card**:
+
+```yaml
+type: custom:pie-card
+entity: sensor.today_s_breakfast_menu
+attribute: categories
+colors:
+  - '#667eea'
+  - '#764ba2'
+  - '#f093fb'
+  - '#f5576c'
+title: Breakfast Categories
+show_percentage: true
+```
+
+### Recommended HACS Integrations
+
+- **[Mushroom Cards](https://hacs.xyz/docs/custom_components/integrations/)** - Modern card styling with gradients and icons
+- **[Pie Card](https://github.com/custom-cards/pie-card)** - Visualize menu category distribution
+- **[Card Mod](https://github.com/thomasloven/ha-card_mod)** - Custom CSS for bubble charts
+- **[Fold Entity Rows](https://github.com/thomasloven/lovelace-fold-entity-rows)** - Collapsible menu categories
 
 ## Project Structure
 
