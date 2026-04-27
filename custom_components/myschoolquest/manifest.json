@@ -1,0 +1,11 @@
+{
+  "domain": "myschoolquest",
+  "name": "MySchoolQuest Menu",
+  "codeowners": ["@YOUR_GITHUB_USERNAME"],
+  "config_flow": true,
+  "documentation": "https://github.com/YOUR_GITHUB_USERNAME/ha-myschoolquest",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/YOUR_GITHUB_USERNAME/ha-myschoolquest/issues",
+  "version": "1.0.0"
+}
