@@ -5,6 +5,7 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.helpers.event import async_track_time_change
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
@@ -69,6 +70,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Set up platforms
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    # Schedule a refresh just after midnight so sensors pick up the new day's data
+    unsub_midnight = async_track_time_change(
+        hass,
+        lambda now: hass.async_create_task(coordinator.async_request_refresh()),
+        hour=0,
+        minute=1,
+        second=0,
+    )
+    entry.async_on_unload(unsub_midnight)
 
     entry.async_on_unload(entry.add_update_listener(async_update_options))
 

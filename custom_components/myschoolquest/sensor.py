@@ -55,37 +55,34 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the MySchoolQuest sensor entities."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]
 
-    today_str = date.today().isoformat()
-    tomorrow_str = (date.today() + timedelta(days=1)).isoformat()
-
     entities = [
         MySchoolQuestMenuWeekSensor(coordinator),
         MySchoolQuestDayMealSensor(
             coordinator,
             name="Today's Breakfast Menu",
             unique_id="myschoolquest_today_breakfast",
-            target_date=today_str,
+            day_offset=0,
             meal_keyword="breakfast",
         ),
         MySchoolQuestDayMealSensor(
             coordinator,
             name="Today's Lunch Menu",
             unique_id="myschoolquest_today_lunch",
-            target_date=today_str,
+            day_offset=0,
             meal_keyword="lunch",
         ),
         MySchoolQuestDayMealSensor(
             coordinator,
             name="Tomorrow's Breakfast Menu",
             unique_id="myschoolquest_tomorrow_breakfast",
-            target_date=tomorrow_str,
+            day_offset=1,
             meal_keyword="breakfast",
         ),
         MySchoolQuestDayMealSensor(
             coordinator,
             name="Tomorrow's Lunch Menu",
             unique_id="myschoolquest_tomorrow_lunch",
-            target_date=tomorrow_str,
+            day_offset=1,
             meal_keyword="lunch",
         ),
     ]
@@ -155,17 +152,22 @@ class MySchoolQuestDayMealSensor(SensorEntity):
         *,
         name: str,
         unique_id: str,
-        target_date: str,
+        day_offset: int,
         meal_keyword: str,
     ) -> None:
         """Initialize the sensor."""
         self.coordinator = coordinator
-        self._target_date = target_date
+        self._day_offset = day_offset
         self._meal_keyword = meal_keyword
         self._attr_name = name
         self._attr_unique_id = unique_id
         self._attr_icon = "mdi:silverware-fork-knife"
         self._attr_native_value = ""
+
+    @property
+    def _target_date(self) -> str:
+        """Compute target date dynamically so it rolls over each day."""
+        return (date.today() + timedelta(days=self._day_offset)).isoformat()
 
     def _get_categories(self, day_data: dict) -> dict:
         """Get categories for this meal period, falling back to all periods."""
